@@ -1,20 +1,18 @@
-# PixAI
+# Ai
 
-A Persian-first, responsive AI chat prototype with a white-and-purple interface.
+A Persian-first AI chat application built with Next.js.
 
-## Current integration
+## Provider connection
 
-- Provider: [Vireonix](https://vireonix.ai/docs)
-- Endpoint: `https://vireonix.ai/v1/chat/completions`
-- Public model route: `auto`
-- No user API key or account is required by the upstream service.
-- Requests are sent through a Next.js server route at `/api/chat`.
+The server route at `/api/chat` is prepared for an OpenAI-compatible chat-completions API. Provider settings are read only on the server:
 
-Vireonix publishes hourly per-IP fair-use budgets. This is **not unlimited service**; requests can receive HTTP 429 when the budget is exhausted. Its public model route and capacity may change.
+- `IVIRA_API_URL`: full HTTPS chat-completions endpoint.
+- `IVIRA_API_KEY`: access token.
+- `IVIRA_MODEL`: model identifier accepted by the provider.
 
-## Privacy notice
+**Important:** The public information currently available for IVIRA does not establish the exact endpoint, request format, or model identifier for the token shared in this project. Do not guess these values. Obtain the API documentation or integration details from IVIRA, then add the three values as private deployment environment variables. Never commit a real token to this repository or expose it in browser-side JavaScript.
 
-Messages sent through PixAI are forwarded to Vireonix. Its terms say prompts, outputs, and related chat traces may be retained and used for service improvement and model training. Do not send passwords, private identifiers, confidential files, or other sensitive information. Show this disclosure to users before public launch and review Vireonix's current privacy policy and terms.
+The route currently expects an OpenAI-compatible response at `choices[0].message.content`. If IVIRA uses a different format, adapt the server route to its documented schema.
 
 ## Run locally
 
@@ -25,17 +23,8 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000.
+Create a local `.env.local` file with the three variables above. Do not commit that file.
 
-No `.env` file or API key is required for the current Vireonix integration.
+## Privacy and limits
 
-## Deploy
-
-Deploy as a Next.js app (for example, on Vercel) by importing this repository. No provider secret is needed for the current keyless endpoint.
-
-## Important production notes
-
-- The current UI uses the single public Vireonix route, `auto`; it is not a true multi-provider model selector yet.
-- The API route validates message roles and caps the forwarded conversation size, but it does not yet provide user accounts, per-user quotas, abuse protection, or persistent chat history.
-- Before opening the app publicly, add application-level rate limiting and abuse controls. Do not try to evade Vireonix's per-IP limits.
-- Vireonix is an external third-party service. Availability, routing, model pool, and fair-use limits can change.
+Messages are forwarded to the configured AI provider. Review that provider's privacy terms before sending personal or confidential information. The app limits each request to 30 messages and 12,000 characters per message; provider-side quotas and limits still apply.
