@@ -13,16 +13,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "تعداد پیام‌ها معتبر نیست." }, { status: 400 });
     }
 
-    safeMessages = messages.map((m) => {
+    safeMessages = messages.map((message) => {
       if (
-        !m ||
-        !["user", "assistant"].includes(m.role) ||
-        typeof m.content !== "string" ||
-        !m.content.trim()
+        !message ||
+        !["user", "assistant"].includes(message.role) ||
+        typeof message.content !== "string" ||
+        !message.content.trim()
       ) {
         throw new Error("ساختار پیام معتبر نیست.");
       }
-      return { role: m.role, content: m.content.slice(0, 12000) };
+      return { role: message.role, content: message.content.slice(0, 12000) };
     });
   } catch (error) {
     const message =
@@ -32,11 +32,37 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
+  // Provider details are configured on the server, never in browser code or Git.
+  const apiUrl = process.env.IVIRA_API_URL;
+  const apiKey = process.env.IVIRA_API_KEY;
+  const model = process.env.IVIRA_MODEL;
+
+  if (!apiUrl || !apiKey || !model) {
+    return NextResponse.json(
+      { error: "اتصال ویرا هنوز پیکربندی نشده است. تنظیمات سرور کامل نیست." },
+      { status: 503 }
+    );
+  }
+
+  let parsedUrl: URL;
   try {
-    const upstream = await fetch("https://vireonix.ai/v1/chat/completions", {
+    parsedUrl = new URL(apiUrl);
+    if (parsedUrl.protocol !== "https:") throw new Error("HTTPS required");
+  } catch {
+    return NextResponse.json(
+      { error: "نشانی API ویرا معتبر نیست؛ باید یک نشانی HTTPS باشد." },
+      { status: 500 }
+    );
+  }
+
+  try {
+    const upstream = await fetch(parsedUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "auto", messages: safeMessages }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({ model, messages: safeMessages }),
       cache: "no-store",
       signal: AbortSignal.timeout(60000),
     });
@@ -46,8 +72,10 @@ export async function POST(request: Request) {
     if (!upstream.ok) {
       const message =
         upstream.status === 429
-          ? "سهمیهٔ ساعتی سرویس فعلاً پر شده؛ کمی بعد دوباره امتحان کن."
-          : "سرویس هوش مصنوعی موقتاً پاسخ‌گو نیست.";
+          ? "سهمیه سرویس فعلاً تمام شده؛ بعداً دوباره امتحان کن."
+          : upstream.status === 401 || upstream.status === 403
+            ? "احراز هویت سرویس ناموفق بود؛ تنظیمات دسترسی را بررسی کن."
+            : "سرویس ویرا فعلاً پاسخ‌گو نیست.";
       return NextResponse.json(
         { error: message },
         { status: upstream.status === 429 ? 429 : 502 }
@@ -56,13 +84,16 @@ export async function POST(request: Request) {
 
     const reply = data?.choices?.[0]?.message?.content;
     if (typeof reply !== "string" || !reply.trim()) {
-      return NextResponse.json({ error: "پاسخ سرویس خالی بود." }, { status: 502 });
+      return NextResponse.json(
+        { error: "پاسخ API با قالب مورد انتظار سازگار نیست." },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({ reply });
   } catch {
     return NextResponse.json(
-      { error: "ارتباط با سرویس هوش مصنوعی برقرار نشد؛ کمی بعد دوباره امتحان کن." },
+      { error: "ارتباط با API برقرار نشد؛ نشانی و وضعیت سرویس را بررسی کن." },
       { status: 502 }
     );
   }
