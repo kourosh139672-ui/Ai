@@ -39,16 +39,16 @@ export default function Home() {
   return (
     <main className="shell">
       <aside className="sidebar">
-        <div className="brand"><span className="brand-mark">✦</span><span>PixAI</span></div>
+        <div className="brand"><span className="brand-mark">✦</span><span>Ai</span></div>
         <button className="new-chat" onClick={() => { setMessages([]); setError(""); }}>＋ گفت‌وگوی جدید</button>
         <div className="side-label">فضای کاری</div>
         <div className="side-link active">▣　 چت هوش مصنوعی</div>
         <div className="side-link">◷　 تاریخچه</div>
         <div className="side-link">⚙　 تنظیمات</div>
-        <div className="sidebar-bottom"><span className="status-dot" /> اتصال آنلاین</div>
+        <div className="sidebar-bottom"><span className="status-dot" /> اتصال به ویرا</div>
       </aside>
       <section className="main-panel">
-        <header className="topbar"><div className="mobile-brand">✦ PixAI</div><div className="model-pill"><span className="status-dot" /> مدل هوشمند <b>Auto</b></div><div className="avatar">P</div></header>
+        <header className="topbar"><div className="mobile-brand">✦ Ai</div><div className="model-pill"><span className="status-dot" /> مدل ویرا <b>Vira</b></div><div className="avatar">P</div></header>
         <div className="chat-area">
           {messages.length === 0 ? (
             <div className="welcome">
@@ -61,17 +61,17 @@ export default function Home() {
               </div>
             </div>
           ) : (
-            <div className="messages">{messages.map((m, i) => <div className={m.role === "user" ? "message user-message" : "message assistant-message"} key={i}><div className="message-avatar">{m.role === "user" ? "ش" : "✦"}</div><div className="message-content"><div className="message-role">{m.role === "user" ? "شما" : "PixAI"}</div><p>{m.content}</p></div></div>)}{busy && <div className="typing"><span/> <span/> <span/> <small>PixAI در حال فکر کردنه…</small></div>}</div>
+            <div className="messages">{messages.map((m, i) => <div className={m.role === "user" ? "message user-message" : "message assistant-message"} key={i}><div className="message-avatar">{m.role === "user" ? "ش" : "✦"}</div><div className="message-content"><div className="message-role">{m.role === "user" ? "شما" : "Ai"}</div><p>{m.content}</p></div></div>)}{busy && <div className="typing"><span/> <span/> <span/> <small>Ai در حال فکر کردنه…</small></div>}</div>
           )}
         </div>
         <div className="composer-wrap">
           {error && <div className="error-box">{error}</div>}
-          {notice && <div className="privacy-note"><span>ⓘ</span><div><b>نکته درباره حریم خصوصی</b><p>پیام‌ها برای تولید پاسخ به Vireonix فرستاده می‌شوند و طبق سیاست آن ممکن است برای بهبود و آموزش مدل نگهداری شوند. اطلاعات شخصی، رمزها یا مطالب محرمانه را ارسال نکن.</p></div><button aria-label="بستن" onClick={() => setNotice(false)}>×</button></div>}
+          {notice && <div className="privacy-note"><span>ⓘ</span><div><b>نکته درباره حریم خصوصی</b><p>پیام‌ها برای دریافت پاسخ به سرویس ویرا فرستاده می‌شوند. پیش از استفاده از اطلاعات شخصی یا محرمانه، سیاست حریم خصوصی سرویس را بررسی کن.</p></div><button aria-label="بستن" onClick={() => setNotice(false)}>×</button></div>}
           <form className="composer" onSubmit={send}>
-            <textarea value={value} onChange={(e) => setValue(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); (e.currentTarget.form as HTMLFormElement)?.requestSubmit(); } }} placeholder="پیامت رو برای PixAI بنویس..." rows={1} />
+            <textarea value={value} onChange={(e) => setValue(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); (e.currentTarget.form as HTMLFormElement)?.requestSubmit(); } }} placeholder="پیامت رو برای Ai بنویس..." rows={1} />
             <button className="send-button" disabled={busy || !value.trim()} aria-label="ارسال پیام">{busy ? "…" : "↑"}</button>
           </form>
-          <div className="composer-caption">PixAI ممکن است اشتباه کند؛ پاسخ‌های مهم را بررسی کن.</div>
+          <div className="composer-caption">Ai ممکن است اشتباه کند؛ پاسخ‌های مهم را بررسی کن.</div>
         </div>
       </section>
     </main>
