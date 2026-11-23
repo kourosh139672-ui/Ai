@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PixAI — گفت‌وگوی هوشمند",
-  description: "چت هوش مصنوعی آنلاین PixAI",
+  title: "Ai — گفت‌وگوی هوشمند",
+  description: "دستیار هوشمند فارسی Ai",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
